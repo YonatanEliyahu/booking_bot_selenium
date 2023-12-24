@@ -1,3 +1,5 @@
+import time
+
 from selenium import webdriver
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
@@ -5,6 +7,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 from booking.helper import sleep_decorator
+from booking.helper import check_date_format
+from booking.helper import is_valid_date
+from booking.helper import date_diff
 import booking.constants as const
 from booking.constants import currencies
 from booking.constants import languages
@@ -85,7 +90,7 @@ class Booking(webdriver.Chrome):
 
         # Use a CSS_SELECTOR expression to find the destination input field
         destination_elm = WebDriverWait(self, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "[id=':re:']"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "form[action*=searchresults] input[id=':re:']"))
         )
 
         # Clear the input field in case there is already some text
@@ -93,3 +98,40 @@ class Booking(webdriver.Chrome):
 
         # Send keys to the input field
         destination_elm.send_keys(destination)
+        time.sleep(1) # load auto completion
+
+        # Use a CSS_SELECTOR expression to find the destination input field
+        autocomplete_elm = WebDriverWait(self, 5).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "[data-testid='autocomplete-result']"))
+        )
+        autocomplete_elm.click()
+
+    def choose_dates(self, checkin: str, checkout: str):
+        if check_date_format(checkin) is False or check_date_format(checkout) is False:
+            raise ValueError
+        if is_valid_date(checkin) is False or is_valid_date(checkout) is False:
+            raise ValueError
+        if date_diff(None, checkin) < 0 or date_diff(checkin, checkout) < 0:  # unavailable date or negative length
+            raise ValueError
+        max_tries = 0
+        checked_in = False
+        next_date_btn = self.find_element(By.CSS_SELECTOR,"[id='calendar-searchboxdatepicker'] button")
+        while max_tries < 12:  # picked dates are in the following 12 months:
+            try:
+                WebDriverWait(self, 1).until(
+                    EC.element_to_be_clickable((By.CSS_SELECTOR,
+                                                f"[data-date='{checkin if  not checked_in else checkout}']"))
+                ).click()                    # selects checkin date and then checkout date
+                if checked_in:
+                    break
+                else:
+                    checked_in=True
+            except Exception:
+                next_date_btn.click()
+                max_tries += 1
+                if max_tries == 12:
+                    raise ValueError
+
+    def submit_search(self):
+        sub_btn = self.find_element(By.CSS_SELECTOR, "form[action*=searchresults] button[type='submit']")
+        sub_btn.click()

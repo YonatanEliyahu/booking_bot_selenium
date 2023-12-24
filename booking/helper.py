@@ -1,6 +1,9 @@
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from datetime import datetime, timedelta
+from dateutil import parser
+from dateutil.parser import ParserError
 
 
 def sleep_decorator(sleepTime=1):
@@ -30,3 +33,39 @@ def get_all_currencries(driver: webdriver.Chrome):
         currencies.add(elem.text)
 
     return currencies
+
+
+def check_date_format(date: str) -> bool:
+    """
+    checks if the date is in YYYY-MM-DD format
+    """
+    temp_date = date.split('-')
+    if len(temp_date) != 3:
+        return False
+    if len(temp_date[0]) != 4 or len(temp_date[1]) != 2 or len(temp_date[2]) != 2:
+        return False
+    return True
+
+
+def is_valid_date(date: str):
+    """
+        checks if the dte formated string is a valid date (not 2024-02-30) for example
+    """
+    try:
+        parsed_date = parser.parse(date)
+        return True
+    except ParserError:
+        return False
+
+def date_diff(from_date:str,to_date:str):
+    """
+    :param from_date: default - now()
+    :return:The function will return the difference between the dates in days
+    """
+    if from_date is None:
+        nfrom_date = datetime.now()
+    else:
+        nfrom_date = datetime.strptime(from_date, "%Y-%m-%d")
+    nto_date= datetime.strptime(to_date, "%Y-%m-%d")
+    return (nto_date-nfrom_date).days
+

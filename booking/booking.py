@@ -33,7 +33,7 @@ class Booking(webdriver.Chrome):
         self.maximize_window()
 
     def __exit__(self, exc_type, exc_val, exc_tb):  # exit function for context manager
-        if False:  # if exc_type is not None:  # if the program not closes properly -> close window
+        if exc_type is not None:  # if the program not closes properly -> close window
             self.quit()
 
     def land_first_page(self):

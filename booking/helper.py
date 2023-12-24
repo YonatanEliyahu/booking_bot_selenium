@@ -14,6 +14,7 @@ def sleep_decorator(sleepTime=1):
 
     return decorator
 
+
 def get_all_currencries(driver: webdriver.Chrome):
     """
     :param driver: webdriver.Chrome obj

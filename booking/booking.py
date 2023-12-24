@@ -85,7 +85,7 @@ class Booking(webdriver.Chrome):
 
         # Use a CSS_SELECTOR expression to find the destination input field
         destination_elm = WebDriverWait(self, 5).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "input[placeholder='Where are you going?']"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "[id=':re:']"))
         )
 
         # Clear the input field in case there is already some text

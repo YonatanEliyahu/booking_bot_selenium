@@ -57,15 +57,18 @@ def is_valid_date(date: str):
     except ParserError:
         return False
 
-def date_diff(from_date:str,to_date:str):
+
+def date_diff(from_date: str, to_date: str):
     """
     :param from_date: default - now()
     :return:The function will return the difference between the dates in days
     """
+    if from_date == to_date:
+        return -1
     if from_date is None:
         nfrom_date = datetime.now()
     else:
         nfrom_date = datetime.strptime(from_date, "%Y-%m-%d")
-    nto_date= datetime.strptime(to_date, "%Y-%m-%d")
-    return (nto_date-nfrom_date).days
-
+    nto_date = datetime.strptime(to_date, "%Y-%m-%d") + timedelta(hours=23, minutes=59, seconds=59)
+    # without timedelta the datetime obj is set to 00:00:00 and then the function will return -1 if to_date is today
+    return (nto_date - nfrom_date).days

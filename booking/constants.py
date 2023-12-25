@@ -7,6 +7,8 @@ MIN_NUM_ADULTS = 1
 MAX_NUM_ADULTS = 30
 MIN_NUM_ROOMS = 1
 MAX_NUM_ROOMS = 30
+MAX_NUM_CHILDREN = 10
+CHILDREN_DEFULT = 0
 
 currencies = {'SGD', 'BHD', 'OMR', 'HUF', 'PLN', 'AED', 'SAR', 'THB', 'CLP', 'CAD', 'GBP', 'SEK', 'BGN', 'MXN',
               'RUB', 'NOK', 'RON', 'GEL', 'KZT', 'TWD', 'DKK', 'MYR', 'KWD', 'JPY', 'IDR', 'TRY', 'ILS', 'COP',

@@ -11,7 +11,9 @@ def main():
         bot.choose_dates(checkin="2023-12-26",
                          checkout="2023-12-30")
         bot.flexiable_dates(1)
-        bot.select_adults(2)
+        bot.select_num_adults(3)
+
+        bot.select_num_rooms(2)
         bot.submit_search()
         print("exiting ...")
 

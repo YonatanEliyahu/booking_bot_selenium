@@ -8,8 +8,10 @@ def main():
         bot.change_lang(lang='US')
         bot.change_currency(curr="USD")
         bot.choose_destination("Tel Aviv")
-        bot.choose_dates(checkin="2024-01-25",
-                         checkout="2024-02-28")
+        bot.choose_dates(checkin="2023-12-26",
+                         checkout="2023-12-30")
+        bot.flexiable_dates(1)
+        bot.select_adults(2)
         bot.submit_search()
         print("exiting ...")
 

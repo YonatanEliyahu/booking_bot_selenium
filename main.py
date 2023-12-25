@@ -12,7 +12,7 @@ def main():
                          checkout="2023-12-30")
         bot.flexiable_dates(1)
         bot.select_num_adults(3)
-
+        bot.select_num_children([1,2,3,4,5,10])
         bot.select_num_rooms(2)
         bot.submit_search()
         print("exiting ...")

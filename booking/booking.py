@@ -1,8 +1,11 @@
 import time
+from typing import List
+
 import selenium
 from selenium import webdriver
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
@@ -38,7 +41,7 @@ class Booking(webdriver.Chrome):
         self.maximize_window()
 
     def __exit__(self, exc_type, exc_val, exc_tb):  # exit function for context manager
-        if exc_type is not None:  # if the program not closes properly -> close window
+        if False:  # if exc_type is not None:  # if the program not closes properly -> close window
             self.quit()
 
     def land_first_page(self):
@@ -165,14 +168,14 @@ class Booking(webdriver.Chrome):
         selection_menu_btn.click()  # open selection menu
 
         # get necessary elements
-        minus_adult_btn, plus_adult_btn, curr_num_adults = break_elements_in_selection_bar(self, "group_adults")
+        minus_adult_btn, plus_adult_btn, curr_num_adults = break_elements_in_selection_bar(self, id="group_adults")
 
         if num_of_adults < curr_num_adults:
             for i in range(curr_num_adults, num_of_adults, -1):
-                minus_adult_btn.click()
+                minus_adult_btn.click()  # remove guest
         elif num_of_adults > curr_num_adults:
             for i in range(curr_num_adults, num_of_adults):
-                plus_adult_btn.click()
+                plus_adult_btn.click()  # add guest
         selection_menu_btn.click()  # close selection menu
 
     def select_num_rooms(self, num_of_rooms: int):
@@ -182,14 +185,38 @@ class Booking(webdriver.Chrome):
         selection_menu_btn.click()  # open selection menu
 
         # get necessary elements
-        minus_room_btn, plus_room_btn, curr_num_rooms = break_elements_in_selection_bar(self, "no_rooms")
+        minus_room_btn, plus_room_btn, curr_num_rooms = break_elements_in_selection_bar(self, id="no_rooms")
 
         if num_of_rooms < curr_num_rooms:
             for i in range(curr_num_rooms, num_of_rooms, -1):
-                minus_room_btn.click()
+                minus_room_btn.click()  # remove room
         elif num_of_rooms > curr_num_rooms:
             for i in range(curr_num_rooms, num_of_rooms):
-                plus_room_btn.click()
+                plus_room_btn.click()  # add room
+        selection_menu_btn.click()  # close selection menu
+
+    def select_num_children(self, children_ages: List[int]):
+        if not (len(children_ages) <= const.MAX_NUM_CHILDREN):
+            raise ValueError
+
+        if len(children_ages) == const.CHILDREN_DEFULT:
+            return
+        selection_menu_btn = self.find_element(By.CSS_SELECTOR, "[data-testid='occupancy-config']")
+        selection_menu_btn.click()  # open selection menu
+
+        # get necessary elements
+        plus_child_btn = self.find_element(By.XPATH,
+                                           "//input[@id='group_children']/parent::*//button[2]")
+
+        for i in range(const.CHILDREN_DEFULT, len(children_ages)):
+            plus_child_btn.click()  # add child
+
+        for index, age in enumerate(children_ages, start=1):  # pick child age in dropdown manus
+            time.sleep(0.25)
+            select_elem = self.find_element(By.XPATH, f"//div[@data-testid='kids-ages-select'][{index}]//select")
+            select = Select(select_elem)
+            select.select_by_value(age.__str__())
+            selection_menu_btn.click()  # reopen selection menu
         selection_menu_btn.click()  # close selection menu
 
     def submit_search(self):

@@ -72,3 +72,20 @@ def date_diff(from_date: str, to_date: str):
     nto_date = datetime.strptime(to_date, "%Y-%m-%d") + timedelta(hours=23, minutes=59, seconds=59)
     # without timedelta the datetime obj is set to 00:00:00 and then the function will return -1 if to_date is today
     return (nto_date - nfrom_date).days
+
+
+def break_elements_in_selection_bar(driver: webdriver, id: str):
+    """
+    this function breaks and specific element in the Booking.com site.
+    this element appears several times in the site and used for selecting number of Adults/Children/Rooms
+    the element structure is      [ -   num   + ]
+    the function will return two buttons and a number.
+    """
+    minus_btn = driver.find_element(By.XPATH,
+                                    f"//input[@id='{id}']/parent::*//button[1]")
+    plus_btn = driver.find_element(By.XPATH,
+                                   f"//input[@id='{id}']/parent::*//button[2]")
+    curr_num = int(driver.find_element(By.XPATH,
+                                       f"//input[@id='{id}']/parent::*/div/span").text)
+
+    return minus_btn, plus_btn, curr_num

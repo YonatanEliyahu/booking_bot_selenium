@@ -1,5 +1,5 @@
 import time
-
+import selenium
 from selenium import webdriver
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
@@ -98,7 +98,7 @@ class Booking(webdriver.Chrome):
 
         # Send keys to the input field
         destination_elm.send_keys(destination)
-        time.sleep(1) # load auto completion
+        time.sleep(1)  # load auto completion
 
         # Use a CSS_SELECTOR expression to find the destination input field
         autocomplete_elm = WebDriverWait(self, 5).until(
@@ -107,30 +107,77 @@ class Booking(webdriver.Chrome):
         autocomplete_elm.click()
 
     def choose_dates(self, checkin: str, checkout: str):
+        """
+        The function get two string based dates,
+        at the first part, the function validate the dates in several checks,
+        and then it picks the date elements in the webdriver
+        Note: dates are limited for 12 mounts from today to save time,
+            to change that, please change the booking.constants.MAXMOUNTS
+        """
+        #  validate dates format
         if check_date_format(checkin) is False or check_date_format(checkout) is False:
             raise ValueError
+
+        #  validate dates as real dates
         if is_valid_date(checkin) is False or is_valid_date(checkout) is False:
             raise ValueError
-        if date_diff(None, checkin) < 0 or date_diff(checkin, checkout) < 0:  # unavailable date or negative length
+
+        #  checks that the checkin is today or after that, and that the checkout is after the checkin
+        if date_diff(None, checkin) < 0 or date_diff(checkin, checkout) < 0:
             raise ValueError
+
         max_tries = 0
-        checked_in = False
-        next_date_btn = self.find_element(By.CSS_SELECTOR,"[id='calendar-searchboxdatepicker'] button")
-        while max_tries < 12:  # picked dates are in the following 12 months:
+        checked_in = False  # will help us to pick the checkin date at the beginning and the checkout after that
+        next_date_btn = self.find_element(By.CSS_SELECTOR, "[id*='searchboxdatepicker'] button")  # next month btn
+        while max_tries < const.MAXMOUNTS:  # picked dates are in the following MAXMOUNTS (12) months:
             try:
-                WebDriverWait(self, 1).until(
+                date = WebDriverWait(self, 0.5).until(
                     EC.element_to_be_clickable((By.CSS_SELECTOR,
-                                                f"[data-date='{checkin if  not checked_in else checkout}']"))
-                ).click()                    # selects checkin date and then checkout date
+                                                f"[data-date='{checkin if not checked_in else checkout}']"))
+                )  # selects checkin date and then checkout date
+                date.click()
                 if checked_in:
                     break
                 else:
-                    checked_in=True
+                    checked_in = True
             except Exception:
-                next_date_btn.click()
+                next_date_btn.click()  # if date not found in the presented calendar, change months
                 max_tries += 1
-                if max_tries == 12:
+                if max_tries == const.MAXMOUNTS:
                     raise ValueError
+
+    def flexiable_dates(self, flex: int = 0):
+        if flex not in const.flexible_dates_options.keys():
+            return
+        try:
+            self.find_element(By.XPATH,
+                              f"//div[@data-testid='flexible-dates-container']//li[{const.flexible_dates_options[flex]}]") \
+                .click()
+        except selenium.common.exceptions.NoSuchElementException:
+            # if button not found, that indicates that the date picking nav is closed and we need to reopen it.
+            self.find_element(By.XPATH, "//div[@data-testid='searchbox-dates-container']/button").click()
+            self.flexiable_dates(flex)
+
+    def select_adults(self, num_of_adults: int = const.ADULTS_DEFAULT):
+        if not (const.MIN_NUM_ADULTS <= num_of_adults <= const.MAX_NUM_ADULTS):
+            raise ValueError
+        selection_menu_btn = self.find_element(By.CSS_SELECTOR, "[data-testid='occupancy-config']")
+        selection_menu_btn.click()  # open selection menu
+        # get necessary elements
+        minus_adult_btn = self.find_element(By.XPATH,
+                                            f"//span[text()='{const.ADULTS_DEFAULT}']/parent::*/button[1]")
+        plus_adult_btn = self.find_element(By.XPATH,
+                                           f"//span[text()='{const.ADULTS_DEFAULT}']/parent::*/button[2]")
+        curr_num_adults = int(self.find_element(By.XPATH,
+                                                f"//span[text()='{const.ADULTS_DEFAULT}']/parent::*/span").text)
+
+        if num_of_adults < curr_num_adults:
+            for i in range(curr_num_adults, num_of_adults, -1):
+                minus_adult_btn.click()
+        elif num_of_adults > curr_num_adults:
+            for i in range(curr_num_adults, num_of_adults):
+                plus_adult_btn.click()
+        selection_menu_btn.click()  # close selection menu
 
     def submit_search(self):
         sub_btn = self.find_element(By.CSS_SELECTOR, "form[action*=searchresults] button[type='submit']")

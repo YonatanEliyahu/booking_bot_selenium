@@ -1,6 +1,10 @@
 DRIVER_PATH = "./chromedriver.exe"
 BASE_URL = "https://www.booking.com/"
-TIME_OUT = 10
+TIME_OUT = 7.5
+MAXMOUNTS = 12
+ADULTS_DEFAULT = 2
+MIN_NUM_ADULTS = 1
+MAX_NUM_ADULTS = 30
 
 currencies = {'SGD', 'BHD', 'OMR', 'HUF', 'PLN', 'AED', 'SAR', 'THB', 'CLP', 'CAD', 'GBP', 'SEK', 'BGN', 'MXN',
               'RUB', 'NOK', 'RON', 'GEL', 'KZT', 'TWD', 'DKK', 'MYR', 'KWD', 'JPY', 'IDR', 'TRY', 'ILS', 'COP',
@@ -15,3 +19,5 @@ languages = {'IL': 'עברית',
              'ES': 'Español',
              'IT': 'Italiano'
              }
+
+flexible_dates_options = {0: 1, 1: 2, 2: 3, 3: 4, 7: 5} # map flexibility to its element position in page

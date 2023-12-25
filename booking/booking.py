@@ -9,7 +9,7 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
-from booking.helper import sleep_decorator, break_elements_in_selection_bar
+from booking.helper import sleep_decorator, break_elements_in_selection_bar, validate_ages
 from booking.helper import check_date_format
 from booking.helper import is_valid_date
 from booking.helper import date_diff
@@ -196,7 +196,8 @@ class Booking(webdriver.Chrome):
         selection_menu_btn.click()  # close selection menu
 
     def select_num_children(self, children_ages: List[int]):
-        if not (len(children_ages) <= const.MAX_NUM_CHILDREN):
+
+        if not (len(children_ages) <= const.MAX_NUM_CHILDREN) or validate_ages(children_ages) is False:
             raise ValueError
 
         if len(children_ages) == const.CHILDREN_DEFULT:

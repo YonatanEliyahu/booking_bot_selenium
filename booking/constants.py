@@ -10,6 +10,9 @@ MAX_NUM_ROOMS = 30
 MAX_NUM_CHILDREN = 10
 CHILDREN_DEFULT = 0
 
+CHILD_MIN_AGE = 0
+CHILD_MAX_AGE = 18
+
 currencies = {'SGD', 'BHD', 'OMR', 'HUF', 'PLN', 'AED', 'SAR', 'THB', 'CLP', 'CAD', 'GBP', 'SEK', 'BGN', 'MXN',
               'RUB', 'NOK', 'RON', 'GEL', 'KZT', 'TWD', 'DKK', 'MYR', 'KWD', 'JPY', 'IDR', 'TRY', 'ILS', 'COP',
               'ZAR', 'EGP', 'USD', 'BRL', 'NZD', 'QAR', 'KRW', 'XOF', 'JOD', 'INR', 'FJD', 'AUD', 'HKD', 'EUR',
@@ -24,4 +27,4 @@ languages = {'IL': 'עברית',
              'IT': 'Italiano'
              }
 
-flexible_dates_options = {0: 1, 1: 2, 2: 3, 3: 4, 7: 5} # map flexibility to its element position in page
+flexible_dates_options = {0: 1, 1: 2, 2: 3, 3: 4, 7: 5}  # map flexibility to its element position in page

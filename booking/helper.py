@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from dateutil import parser
 from dateutil.parser import ParserError
 
+from booking.constants import CHILD_MIN_AGE, CHILD_MAX_AGE
+
 
 def sleep_decorator(sleepTime=1):
     def decorator(func):
@@ -89,3 +91,14 @@ def break_elements_in_selection_bar(driver: webdriver, id: str):
                                        f"//input[@id='{id}']/parent::*/div/span").text)
 
     return minus_btn, plus_btn, curr_num
+
+
+def validate_ages(age_lst):
+    """
+    :param age_lst: list of ages
+    :return: return True if all ages are in [CHILD_MIN_AGE,CHILD_MAX_AGE], False otherwise.
+    """
+    for age in age_lst:
+        if age < CHILD_MIN_AGE or age > CHILD_MAX_AGE:
+            return False
+    return True

@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
-from booking.helper import sleep_decorator
+from booking.helper import sleep_decorator, break_elements_in_selection_bar
 from booking.helper import check_date_format
 from booking.helper import is_valid_date
 from booking.helper import date_diff
@@ -158,18 +158,14 @@ class Booking(webdriver.Chrome):
             self.find_element(By.XPATH, "//div[@data-testid='searchbox-dates-container']/button").click()
             self.flexiable_dates(flex)
 
-    def select_adults(self, num_of_adults: int = const.ADULTS_DEFAULT):
+    def select_num_adults(self, num_of_adults: int = const.ADULTS_DEFAULT):
         if not (const.MIN_NUM_ADULTS <= num_of_adults <= const.MAX_NUM_ADULTS):
             raise ValueError
         selection_menu_btn = self.find_element(By.CSS_SELECTOR, "[data-testid='occupancy-config']")
         selection_menu_btn.click()  # open selection menu
+
         # get necessary elements
-        minus_adult_btn = self.find_element(By.XPATH,
-                                            f"//span[text()='{const.ADULTS_DEFAULT}']/parent::*/button[1]")
-        plus_adult_btn = self.find_element(By.XPATH,
-                                           f"//span[text()='{const.ADULTS_DEFAULT}']/parent::*/button[2]")
-        curr_num_adults = int(self.find_element(By.XPATH,
-                                                f"//span[text()='{const.ADULTS_DEFAULT}']/parent::*/span").text)
+        minus_adult_btn, plus_adult_btn, curr_num_adults = break_elements_in_selection_bar(self, "group_adults")
 
         if num_of_adults < curr_num_adults:
             for i in range(curr_num_adults, num_of_adults, -1):
@@ -177,6 +173,23 @@ class Booking(webdriver.Chrome):
         elif num_of_adults > curr_num_adults:
             for i in range(curr_num_adults, num_of_adults):
                 plus_adult_btn.click()
+        selection_menu_btn.click()  # close selection menu
+
+    def select_num_rooms(self, num_of_rooms: int):
+        if not (const.MIN_NUM_ROOMS <= num_of_rooms <= const.MAX_NUM_ROOMS):
+            raise ValueError
+        selection_menu_btn = self.find_element(By.CSS_SELECTOR, "[data-testid='occupancy-config']")
+        selection_menu_btn.click()  # open selection menu
+
+        # get necessary elements
+        minus_room_btn, plus_room_btn, curr_num_rooms = break_elements_in_selection_bar(self, "no_rooms")
+
+        if num_of_rooms < curr_num_rooms:
+            for i in range(curr_num_rooms, num_of_rooms, -1):
+                minus_room_btn.click()
+        elif num_of_rooms > curr_num_rooms:
+            for i in range(curr_num_rooms, num_of_rooms):
+                plus_room_btn.click()
         selection_menu_btn.click()  # close selection menu
 
     def submit_search(self):

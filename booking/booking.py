@@ -116,6 +116,14 @@ class Booking(webdriver.Chrome):
         )
         autocomplete_elm.click()
 
+    def __open_datepicker_tab(self):
+        try:
+            # trying to get the element
+            self.find_element(By.CSS_SELECTOR, "[data-testid='searchbox-datepicker']")
+        except:
+            # if the element is not presented, click the button to open it
+            self.find_element(By.CSS_SELECTOR, "[data - testid = 'searchbox-dates-container']").click()
+
     def flexible_vacation(self, duration: str, months: List[int]):
         """
         duration: this parameter has four options, "weekend", "week", "month", "other-{num_days}-{from}",
@@ -126,6 +134,7 @@ class Booking(webdriver.Chrome):
         if not (0 < len(months) <= 3) or duration.split('-')[0] not in const.flexible_duration_options:
             raise ValueError
 
+        self.__open_datepicker_tab()
         # move to flexible vacation mode
         self.find_element(By.CSS_SELECTOR, "[aria-controls='flexible-searchboxdatepicker']").click()
 
@@ -167,7 +176,7 @@ class Booking(webdriver.Chrome):
 
     def __pick_months(self, months: List[int]):
         """
-        the function get a list of months and picks them to be the mount of the vacation
+        the function get a list of months and picks them to be the month of the vacation
         """
         if bh.validate_months(months) is False:
             raise ValueError("Illegal month was picked")
@@ -192,6 +201,7 @@ class Booking(webdriver.Chrome):
         Note: dates are limited for 12 mounts from today to save time,
             to change that, please change the booking.constants.MAXMOUNTS
         """
+        self.__open_datepicker_tab()
         #  validate dates format
         if bh.check_date_format(checkin) is False or bh.check_date_format(checkout) is False:
             raise ValueError

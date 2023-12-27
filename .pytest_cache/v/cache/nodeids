@@ -1,0 +1,4 @@
+[
+  "test_booking.py::test_land_first_page",
+  "test_booking.py::test_submit_search_without_values"
+]

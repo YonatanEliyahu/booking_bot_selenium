@@ -1,4 +1,5 @@
 import time
+from typing import List
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from datetime import datetime, timedelta
@@ -20,10 +21,10 @@ def sleep_decorator(sleepTime=1):
     return decorator
 
 
-def get_all_currencries(driver: webdriver.Chrome):
+def get_all_currencies(driver: webdriver.Chrome):
     """
-    :param driver: webdriver.Chrome obj
-    :return: list of currencies from Booking.com site
+    driver: webdriver.Chrome obj
+    return :list of currencies from Booking.com site
     """
     # Use a CSS_SELECTOR expression to find the currency popup element
     curr_elem = driver.find_element(By.CSS_SELECTOR, "[data-testid='header-currency-picker-trigger']")
@@ -51,7 +52,7 @@ def check_date_format(date: str) -> bool:
 
 def is_valid_date(date: str):
     """
-        checks if the dte formated string is a valid date (not 2024-02-30) for example
+        checks if the dte formatted string is a valid date (not 2024-02-30) for example
     """
     try:
         parsed_date = parser.parse(date)
@@ -62,12 +63,12 @@ def is_valid_date(date: str):
 
 def date_diff(from_date: str, to_date: str):
     """
-    :param from_date: default - now()
-    :return:The function will return the difference between the dates in days
+    from_date: default - now()
+    The function will return the difference between the dates in days
     """
     if from_date == to_date:
         return -1
-    if from_date is None:
+    if from_date == "":
         nfrom_date = datetime.now()
     else:
         nfrom_date = datetime.strptime(from_date, "%Y-%m-%d")
@@ -95,10 +96,22 @@ def break_elements_in_selection_bar(driver: webdriver, id: str):
 
 def validate_ages(age_lst):
     """
-    :param age_lst: list of ages
-    :return: return True if all ages are in [CHILD_MIN_AGE,CHILD_MAX_AGE], False otherwise.
+    age_lst: list of ages
+    returns True if all ages are in [CHILD_MIN_AGE,CHILD_MAX_AGE], False otherwise.
     """
     for age in age_lst:
         if age < CHILD_MIN_AGE or age > CHILD_MAX_AGE:
+            return False
+    return True
+
+
+def validate_months(months: List[int]) -> bool:
+    """
+    Validates a list of month strings.
+    months (List[int]): A list of ints representing months.
+    returns True if all months are valid (between 1 and 12), False otherwise.
+    """
+    for month in months:
+        if month not in range(1, 13):
             return False
     return True

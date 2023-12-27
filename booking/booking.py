@@ -14,15 +14,21 @@ import booking.constants as const
 
 class Booking(webdriver.Chrome):
 
-    def __init__(self, driver_path=const.DRIVER_PATH, detach=True):
-        # Set the private attribute to the provided or default driver path
+    def __init__(self, driver_path: str = const.DRIVER_PATH, detach=True):
+        """
+        Constructor for the Booking class. Initializes the Chrome WebDriver with specified options.
+        Parameters:
+           - driver_path (str): Path to the Chrome WebDriver executable.
+           - detach (bool): If True, the browser window will be detached.
+        """
+        # Set the path for the WebDriver executable to the provided or default value.
         self.__driver_path = driver_path
         # Add the driver path to the system's PATH environment variable
         os.environ['PATH'] += self.__driver_path
 
         # Configure Chrome options
         chrome_options = webdriver.ChromeOptions()
-        # If detach is True, add the experimental option to detach the browser window
+        # If True, the browser window will be detached, allowing it to run independently.
         if detach:
             chrome_options.add_experimental_option("detach", True)
 
@@ -34,16 +40,23 @@ class Booking(webdriver.Chrome):
         # Maximize the browser window
         self.maximize_window()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):  # exit function for context manager
-        if exc_type is not None:  # if the program not closes properly -> close window
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Exit function for the Booking context manager.
+        It ensures proper cleanup, closing the browser window if the program does not exit properly.
+        """
+        if exc_type is not None:
             self.quit()
 
     def land_first_page(self):
-        self.get(const.BASE_URL)  # open booking.com
+        """
+        Open the booking.com website.
+        """
+        self.get(const.BASE_URL)
 
     def close_popup(self):
         try:
-            # Wait for the popup button to be clickable within a timeout of 5 seconds
+            # Wait up to 5 seconds for the popup close button to become clickable.
             popup_close_window = WebDriverWait(self, 5).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "[role='dialog'] button"))
             )
@@ -51,7 +64,7 @@ class Booking(webdriver.Chrome):
             popup_close_window.click()
 
         except TimeoutException:
-            # Handle the case where the element is not found within the timeout
+            # Handle the case where the popup button is not found within the specified timeout.
             print("Popup button not found within the specified timeout.")
 
     @bh.sleep_decorator()
@@ -201,12 +214,12 @@ class Booking(webdriver.Chrome):
                                                 f"[data-date='{checkin if not checked_in else checkout}']"))
                 )  # selects checkin date and then checkout date
                 date.click()
-                if checked_in:
+                if checked_in:  # if both of the dates found successfully
                     break
-                else:
+                else:  # just the checkin date was found (now)
                     checked_in = True
-            except Exception:
-                next_date_btn.click()  # if date not found in the presented calendar, change months
+            except:
+                next_date_btn.click()  # if date not found in the visible calendar, change months
                 max_tries += 1
                 if max_tries == const.MAX_MONTHS:
                     raise ValueError
@@ -286,7 +299,7 @@ class Booking(webdriver.Chrome):
 
     def entire_place_option(self, check: bool = False):
         """
-        This function will enable/disable the "I'm looking for an entire home or apartment" search option
+        This function will enable/disable the "I'm looking for an entire home or apartment" search option.
         """
         option_elem = self.find_element(By.CSS_SELECTOR,
                                         "[data-testid='searchbox-footer'] input[name='sb_entire_place']")
@@ -297,7 +310,7 @@ class Booking(webdriver.Chrome):
 
     def work_travel_option(self, check: bool = False):
         """
-        This function will enable/disable the "I'm traveling for work" search option
+        This function will enable/disable the "I'm traveling for work" search option.
         """
         option_elem = self.find_element(By.CSS_SELECTOR,
                                         "[data-testid='searchbox-footer'] input[name='sb_travel_purpose']")

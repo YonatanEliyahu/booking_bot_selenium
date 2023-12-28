@@ -1,5 +1,4 @@
 import time
-
 import pytest
 from booking.booking import Booking
 from selenium.webdriver.common.by import By
